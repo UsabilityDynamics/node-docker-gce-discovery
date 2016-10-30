@@ -32,3 +32,9 @@ discoveryInstance.on('change', function containerListChange( error, containerLis
   // updated containerList including whatever container was added/removed
 });
 ```
+
+In case any errors occur, perhaps a watched connection is interrupted:
+```js
+discoveryInstance.on('error', function generalError( error ) {
+  // error details
+});
