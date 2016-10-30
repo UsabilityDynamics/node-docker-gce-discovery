@@ -1,0 +1,102 @@
+[
+  {
+    "Id": "e95b656b6e7394daee50c7f9ac5ec55bca0397f3680ae0260cc466267afaa952",
+    "Names": [
+      "/15746917.service.a"
+    ],
+    "Image": "some/image",
+    "Command": "/bin/bash",
+    "Created": 1477644893,
+    "Ports": [
+      {
+        "IP": "10.0.0.2",
+        "PrivatePort": 80,
+        "PublicPort": 32863,
+        "Type": "tcp"
+      }
+    ],
+    "Labels": {
+      "app.env": "production",
+      "app.name": "service-a"
+    },
+    "Status": "Up 2 days",
+    "HostConfig": {
+      "NetworkMode": "default"
+    }
+  },
+  {
+    "Id": "924ba33147baac43f21083d64b037174c3d580353a530e7fe65862dcf751468a",
+    "Names": [
+      "/14706393.service.b"
+    ],
+    "Image": "some/image",
+    "Command": "/bin/bash",
+    "Created": 1476742438,
+    "Ports": [
+      {
+        "IP": "10.0.0.2",
+        "PrivatePort": 80,
+        "PublicPort": 32862,
+        "Type": "tcp"
+      }
+    ],
+    "Labels": {
+      "app.env": "production",
+      "app.name": "service-b"
+    },
+    "Status": "Up 12 days",
+    "HostConfig": {
+      "NetworkMode": "default"
+    }
+  },
+  {
+    "Id": "334ba33147baac43f21083d64b037174c3d580353a530e7fe65862dcf7514611",
+    "Names": [
+      "/14706393.service.b.dev"
+    ],
+    "Image": "some/image",
+    "Command": "/bin/bash",
+    "Created": 1476742431,
+    "Ports": [
+      {
+        "IP": "10.0.0.2",
+        "PrivatePort": 80,
+        "PublicPort": 32862,
+        "Type": "tcp"
+      }
+    ],
+    "Labels": {
+      "app.env": "development",
+      "app.name": "service-b"
+    },
+    "Status": "Up 4 days",
+    "HostConfig": {
+      "NetworkMode": "default"
+    }
+  },
+  {
+    "Id": "e9f4c5ae208e6e606eabb64cc2be4c95b3942b3ae7c79ffbdc286c5e1df00f21",
+    "Names": [
+      "/14694397.service.c"
+    ],
+    "Image": "some/image",
+    "Command": "/bin/bash",
+    "Created": 1476733951,
+    "Ports": [
+      {
+        "IP": "10.0.0.3",
+        "PrivatePort": 80,
+        "PublicPort": 32859,
+        "Type": "tcp"
+      }
+    ],
+    "Labels": {
+      "app.env": "production",
+      "app.name": "service-c"
+    },
+    "Status": "Up 12 days",
+    "HostConfig": {
+      "NetworkMode": "default"
+    }
+  }
+]

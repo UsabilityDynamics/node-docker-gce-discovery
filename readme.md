@@ -12,6 +12,7 @@ To use a Google Cloud service account token is required.
 var discoveryInstance = require('docker-gce-discovery').create({
   gceConfig: '..path to service account JSON file or the object itself...',
   machineTags: [ 'docker-machine' ], // required tags a GCE machine must have to be monitored
+  containerLabels: [ 'app.env=production' ], // list of labels a container must have to be in our list
   dockerPort: 2280, // which port on the found machines to use to connect
   watch: true // if enabled watch Docker Daemon for changes
 });

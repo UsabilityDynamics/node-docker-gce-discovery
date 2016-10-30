@@ -1,0 +1,67 @@
+[
+  {
+    "active": true,
+    "name": "machine-a",
+    "networkHostname": "machine-a.c.myproject.internal",
+    "publicHostname": "machine-a.myproject.io",
+    "creationTimestamp": "2016-02-26T19:11:10.055-08:00",
+    "selfLink": "https://www.googleapis.com/compute/v1/projects/myproject/zones/us-central1-c/instances/machine-a",
+    "networkAddress": "10.0.0.2",
+    "publicAddress": "130.211.144.181",
+    "machineType": "https://www.googleapis.com/compute/v1/projects/myproject/zones/us-central1-c/machineTypes/n1-highmem-8",
+    "zone": "https://www.googleapis.com/compute/v1/projects/myproject/zones/us-central1-c",
+    "description": "someService/v1.0",
+    "tags": [
+      "docker-machine"
+    ]
+  },
+  {
+    "active": true,
+    "name": "machine-b",
+    "networkHostname": "machine-b.c.myproject.internal",
+    "publicHostname": "machine-b.myproject.io",
+    "creationTimestamp": "2016-02-26T19:11:10.055-08:00",
+    "selfLink": "https://www.googleapis.com/compute/v1/projects/myproject/zones/us-central1-c/instances/machine-b",
+    "networkAddress": "10.0.0.3",
+    "publicAddress": "130.211.145.181",
+    "machineType": "https://www.googleapis.com/compute/v1/projects/myproject/zones/us-central1-c/machineTypes/n1-highmem-8",
+    "zone": "https://www.googleapis.com/compute/v1/projects/myproject/zones/us-central1-c",
+    "description": "someService/v1.0",
+    "tags": [
+      "docker-machine"
+    ]
+  },
+  {
+    "active": true,
+    "name": "machine-c",
+    "networkHostname": "machine-c.c.myproject.internal",
+    "publicHostname": "machine-b.myproject.io",
+    "creationTimestamp": "2016-02-26T19:11:10.055-08:00",
+    "selfLink": "https://www.googleapis.com/compute/v1/projects/myproject/zones/us-central1-c/instances/machine-b",
+    "networkAddress": "10.0.0.4",
+    "publicAddress": "130.211.146.181",
+    "machineType": "https://www.googleapis.com/compute/v1/projects/myproject/zones/us-central1-c/machineTypes/n1-highmem-8",
+    "zone": "https://www.googleapis.com/compute/v1/projects/myproject/zones/us-central1-c",
+    "description": "someService/v1.0",
+    "tags": [
+      "docker-machine"
+    ]
+  },
+  {
+    "active": true,
+    "name": "machine-d",
+    "networkHostname": "machine-d.c.myproject.internal",
+    "publicHostname": "machine-d.myproject.io",
+    "creationTimestamp": "2016-02-26T19:11:10.055-08:00",
+    "selfLink": "https://www.googleapis.com/compute/v1/projects/myproject/zones/us-central1-c/instances/machine-d",
+    "networkAddress": "10.0.0.5",
+    "publicAddress": "130.211.147.181",
+    "machineType": "https://www.googleapis.com/compute/v1/projects/myproject/zones/us-central1-c/machineTypes/n1-highmem-8",
+    "zone": "https://www.googleapis.com/compute/v1/projects/myproject/zones/us-central1-c",
+    "description": "someService/v1.0",
+    "tags": [
+      "some-other-machine",
+      "no-docker-here"
+    ]
+  }
+]
