@@ -1,0 +1,1 @@
+A Node.js library for discovering Docker containers on multiple hosts.

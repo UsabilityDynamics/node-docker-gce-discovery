@@ -1,0 +1,24 @@
+{
+  "name": "docker-gce-discovery",
+  "version": "0.1.0",
+  "description": "A Node.js library for discovering Docker containers on multiple hosts.",
+  "main": "lib/index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/UsabilityDynamics/node-docker-gce-discovery.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/UsabilityDynamics/node-docker-gce-discovery/issues"
+  },
+  "homepage": "https://github.com/UsabilityDynamics/node-docker-gce-discovery#readme",
+  "dependencies": {
+    "async": "^2.1.2",
+    "debug": "^2.2.0",
+    "lodash": "^4.16.4"
+  }
+}
