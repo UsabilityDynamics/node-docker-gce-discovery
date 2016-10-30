@@ -21,7 +21,7 @@ Callback triggered once we have list of containers across our cluster, or someth
 
 ```js
 discoveryInstance.once('ready',function haveContainerList( error, containerList ) {
-  // here we can do something with the containerlist, which is an array of Docker containers with post-inspect detail
+  // here we can do something with the containerlist, an array of Docker Containers
 });
 ```
 
