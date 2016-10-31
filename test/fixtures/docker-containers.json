@@ -17,7 +17,8 @@
     ],
     "Labels": {
       "app.env": "production",
-      "app.name": "service-a"
+      "app.name": "service-a",
+      "app.path": "/service-a"
     },
     "Status": "Up 2 days",
     "HostConfig": {
@@ -42,7 +43,8 @@
     ],
     "Labels": {
       "app.env": "production",
-      "app.name": "service-b"
+      "app.name": "service-b",
+      "app.path": "/service-b"
     },
     "Status": "Up 12 days",
     "HostConfig": {
@@ -67,7 +69,8 @@
     ],
     "Labels": {
       "app.env": "development",
-      "app.name": "service-b"
+      "app.name": "service-b",
+      "app.path": "/service-b"
     },
     "Status": "Up 4 days",
     "HostConfig": {
@@ -92,7 +95,8 @@
     ],
     "Labels": {
       "app.env": "production",
-      "app.name": "service-c"
+      "app.name": "service-c",
+      "app.path": "/service-c"
     },
     "Status": "Up 12 days",
     "HostConfig": {
