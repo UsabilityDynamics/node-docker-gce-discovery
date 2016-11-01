@@ -15,19 +15,36 @@ async.auto({
   }],
   instances_list: ['container_list', function(results, callback){
 
+    //console.log('results.container_list', require('util').inspect(results.container_list, {showHidden: false, depth: 10, colors: true}));
+
     var instances = {};
+    // var instances = new DockerEvents({
+    //     docker: new Dockerode({
+    //       host: '10.0.0.9',
+    //       port: 12110
+    //     }),
+    //   });
+    //
+    // callback(null, instances);
 
     async.each(results.container_list, function(value_each, callback_each){
       _.each(value_each, function(value, key){
 
-        Object.defineProperty( instances, 'emmiter_' + key, {
-          "enumerable": true,
-          "value" : new DockerEvents({
-            docker: new Dockerode({
-              host: value.host,
-              port: value.port || 2375
-            }),
-          })
+        // Object.defineProperty( instances, 'emmiter_' + key, {
+        //   "enumerable": true,
+        //   "value" : new DockerEvents({
+        //     docker: new Dockerode({
+        //       host: value.host,
+        //       port: value.port || 2375
+        //     }),
+        //   })
+        // });
+
+        instances[key] = new DockerEvents({
+          docker: new Dockerode({
+            host: value.host,
+            port: parseInt(value.port)
+          }),
         });
         callback_each();
       });
@@ -39,41 +56,38 @@ async.auto({
   }],
 }, function(error, result){
 
+
   //console.log('result.container_list', require('util').inspect(result.instances_list, {showHidden: false, depth: 10, colors: true}));
 
-  // _.each(result.instances_list, function(value, key){
-  //
-  //   if(key == 'emmiter_mosul'){
+  _.each(result.instances_list, function(value, key){
 
-  var mosul = result.instances_list.emmiter_mosul;
+    //if(key == 'emmiter_mosul'){
 
+  //var mosul = result.instances_list.emmiter_mosul;
 
+    value.start();
 
-  mosul.start();
+    value.on("connect", function() {
+      console.log("connected to docker api machine [" + key + "]");
+    });
 
-  mosul.on("connect", function() {
-    console.log("connected to docker api");
+    value.on("create", function(message) {
+      console.log("container created on [" + key + "] machine: %j", message);
+    });
+
+    value.on("start", function(message) {
+      console.log("container started on [" + key + "] machine: %j", message);
+    });
+
+    value.on("stop", function(message) {
+      console.log("container stopped on [" + key + "] machine: %j", message);
+    });
+
+    value.stop();
+
+  //}
+
   });
-
-  mosul.on("create", function(message) {
-        console.log("container created: %j", message);
-      });
-
-  mosul.on("start", function(message) {
-        console.log("container started: %j", message);
-      });
-
-  mosul.on("stop", function(message) {
-        console.log("container stopped: %j", message);
-      });
-
-  mosul.stop();
-
-    //}
-
-  // });
-
-
 
   //console.log(require('util').inspect(events, {showHidden: false, depth: 10, colors: true}));
 
