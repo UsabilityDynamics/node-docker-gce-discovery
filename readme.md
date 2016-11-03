@@ -17,6 +17,7 @@ var discoveryInstance = require('docker-gce-discovery').create({
   watch: true // if enabled watch Docker Daemon for changes
 });
 ```
+discoveryInstance.containers
 
 Callback triggered once we have list of containers across our cluster, or something went wrong
 
