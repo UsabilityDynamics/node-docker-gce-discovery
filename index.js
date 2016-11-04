@@ -11,13 +11,12 @@ module.exports.create = function containersList( options ) {
     machines: []
   };
   
-  // options = _.defaults(options, {
-  //   gceConfig: {}, //path to service account JSON file or the object itself || string
-  //   machineTags: [], // required tags a GCE machine must have to be monitored || array
-  //   containerLabels: [], // list of labels a container must have to be in our list || array
-  //   dockerPort: 2375, // which port on the found machines to use to connect || number
-  //   watch: false // if enabled watch Docker Daemon for changes || bool
-  // });
+  options = _.defaults(options, {
+    gceConfig: {}, //path to service account JSON file or the object itself || string
+    machineTags: [], // required tags a GCE machine must have to be monitored || array
+    dockerPort: 2375, // which port on the found machines to use to connect || number
+    watch: true // if enabled watch Docker Daemon for changes || bool
+  });
 
   //console.log('create options', require('util').inspect(options, {showHidden: false, depth: 10, colors: true}));
 
@@ -40,16 +39,6 @@ module.exports.create = function containersList( options ) {
       console.log(require('util').inspect('inside instances_list', {showHidden: false, depth: 10, colors: true}));
 
       async.each(results.get_machines_data.machines, function (value_each, callback_each) {
-
-          // Object.defineProperty( instances, 'emmiter_' + key, {
-          //   "enumerable": true,
-          //   "value" : new DockerEvents({
-          //     docker: new Dockerode({
-          //       host: value.host,
-          //       port: value.port || 2375
-          //     }),
-          //   })
-          // });
 
           instances[value_each.name] = new DockerEvents({
             docker: new Dockerode({
@@ -92,7 +81,8 @@ module.exports.create = function containersList( options ) {
         value.on("create", function (message) {
           console.log("container created on [" + key + "] machine: %j " + new Date(), message);
           getDockerContainers.getDockerContainers(options, function getContainers(options, machines_data) {
-            _.each(machines_data, function(item){
+            _state.containers = [];
+            _.each(machines_data.containers, function(item){
               _state.containers.push(item)
             });
           });
@@ -101,34 +91,27 @@ module.exports.create = function containersList( options ) {
         value.on("start", function (message) {
           console.log("container started on [" + key + "] machine: %j " + new Date(), message);
           getDockerContainers.getDockerContainers(options, function getContainers(options, machines_data) {
-            _.each(machines_data, function(item){
+            _state.containers = [];
+            _.each(machines_data.containers, function(item){
               _state.containers.push(item)
             });
+            //console.log('start _state.containers', require('util').inspect(_state.containers, {showHidden: false, depth: 1, colors: true}));
           });
         });
 
         value.on("stop", function (message) {
           console.log("container stopped on [" + key + "] machine: %j " + new Date(), message);
-          // _.each(containers_list, function (machine, number_machine) {
-          //   _.each(machine, function (machine_data, machine_name) {
-          //     if (key == machine_name) {
-          //       _.each(machine_data.containers, function (container, number_container) {
-          //         if (container.Id == message.id) {
-          //           containers_list[number_machine][machine_name].containers.splice(number_container, 1);
-          //           _state.containers = containers_list;
-          //           console.log('_state.containers', require('util').inspect(_state.containers, {showHidden: false, depth: 1, colors: true}));
-          //         }
-          //       });
-          //     }
-          //   });
-          // });
 
+          //console.log('stop _state.containers', require('util').inspect(_state.containers, {showHidden: false, depth: 1, colors: true}));
         _.each(_state.containers, function(container, number_container){
           // console.log('container.Id', require('util').inspect(container.Id, {showHidden: false, depth: 10, colors: true}));
           // console.log('message.id', require('util').inspect(message.id, {showHidden: false, depth: 10, colors: true}));
-          if (container.Id == message.id) {
-            _state.containers.splice(number_container, 1);
-            console.log('_state.containers', require('util').inspect(_state.containers, {showHidden: false, depth: 1, colors: true}));
+          if(typeof container != 'undefined'){
+            if (container.Id == message.id) {
+              //console.log('container.Id', require('util').inspect(container.Id, {showHidden: false, depth: 1, colors: true}));
+              _state.containers.splice(number_container, 1);
+              //console.log('stop _state.containers', require('util').inspect(_state.containers, {showHidden: false, depth: 1, colors: true}));
+            }
           }
         });
 
@@ -136,23 +119,11 @@ module.exports.create = function containersList( options ) {
 
         value.on("destroy", function (message) {
           console.log("container destroyed on [" + key + "] machine: %j " + new Date(), message);
-          // _.each(containers_list, function (machine, number_machine) {
-          //   _.each(machine, function (machine_data, machine_name) {
-          //     if (key == machine_name) {
-          //       _.each(machine_data.containers, function (container, number_container) {
-          //         if (container.Id == message.id) {
-          //           containers_list[number_machine][machine_name].containers.splice(number_container, 1);
-          //           _state.containers = containers_list;
-          //         }
-          //       });
-          //     }
-          //   });
-          // });
 
           _.each(_state.containers, function(container, number_container){
             if (container.Id == message.id) {
               _state.containers.splice(number_container, 1);
-              console.log('_state.containers', require('util').inspect(_state.containers, {showHidden: false, depth: 1, colors: true}));
+              console.log('destroy _state.containers', require('util').inspect(_state.containers, {showHidden: false, depth: 1, colors: true}));
             }
           });
 
