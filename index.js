@@ -14,6 +14,9 @@ module.exports.create = function containersList( options ) {
   
   options = _.defaults(options, {
     gceConfig: {}, //path to service account JSON file or the object itself || string
+    zones: [],
+    project: null,
+    externalIP: false,
     machineTags: [], // required tags a GCE machine must have to be monitored || array
     dockerPort: 2375, // which port on the found machines to use to connect || number
     watch: true // if enabled watch Docker Daemon for changes || bool
