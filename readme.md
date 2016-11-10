@@ -16,9 +16,13 @@ var discoveryInstance = require('docker-gce-discovery').create({
   watch: true // if enabled watch Docker Daemon for changes
 });
 ```
-discoveryInstance.containers has containers list.
+```js
+discoveryInstance.containers //has containers list.
+```
 
-discoveryInstance.machines has machines list.
+```js
+discoveryInstance.machines //has machines list.
+```
 
 Callback triggered once we have list of containers across our cluster, or something went wrong
 
@@ -27,17 +31,3 @@ discoveryInstance.once('ready',function haveContainerList( error, containerList 
   // here we can do something with the containerlist, an array of Docker Containers
 });
 ```
-
-If we use the `watch:true` option, then our instance will maintain a connection to each Docker Daemon and watch for changes:
-
-```js
-discoveryInstance.on('change', function containerListChange( error, containerList ) {
-  // updated containerList including whatever container was added/removed
-});
-```
-
-In case any errors occur, perhaps a watched connection is interrupted:
-```js
-discoveryInstance.on('error', function generalError( error ) {
-  // error details
-});
