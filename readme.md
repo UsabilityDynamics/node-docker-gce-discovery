@@ -23,11 +23,3 @@ discoveryInstance.containers //has containers list.
 ```js
 discoveryInstance.machines //has machines list.
 ```
-
-Callback triggered once we have list of containers across our cluster, or something went wrong
-
-```js
-discoveryInstance.once('ready',function haveContainerList( error, containerList ) {
-  // here we can do something with the containerlist, an array of Docker Containers
-});
-```
