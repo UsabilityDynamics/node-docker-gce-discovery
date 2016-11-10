@@ -1,6 +1,6 @@
 {
   "name": "docker-gce-discovery",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "A Node.js library for discovering Docker containers on multiple hosts.",
   "main": "lib/index.js",
   "scripts": {
