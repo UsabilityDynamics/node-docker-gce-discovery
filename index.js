@@ -120,7 +120,7 @@ module.exports.create = function containersList( options ) {
               }
             });
           } else {
-            debug("destroy event: container object is emty: %j " + new Date(), message);
+            debug("destroy event: container object is empty: %j " + new Date(), message);
           }
         });
         value.stop();
