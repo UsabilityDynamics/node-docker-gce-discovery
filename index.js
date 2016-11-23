@@ -62,7 +62,7 @@ module.exports.create = function containersList( options ) {
     }
 
     _.each(result.get_machines_data.containers, function(item2){
-      _state.containers.push(item2)
+      _state.containers.push(item2);
     });
 
     if(options.watch){
@@ -83,7 +83,7 @@ module.exports.create = function containersList( options ) {
           getDockerContainers.getDockerContainers(options, function getContainers(options, machines_data) {
             _state.containers = [];
             _.each(machines_data.containers, function(item){
-              _state.containers.push(item)
+              _state.containers.push(item);
             });
           });
         });
@@ -93,27 +93,35 @@ module.exports.create = function containersList( options ) {
           getDockerContainers.getDockerContainers(options, function getContainers(options, machines_data) {
             _state.containers = [];
             _.each(machines_data.containers, function(item){
-              _state.containers.push(item)
+              _state.containers.push(item);
             });
           });
         });
 
         value.on("stop", function (message) {
-          debug("container stopped on [" + key + "] machine: %j " + new Date(), message);
-        _.each(_state.containers, function(container, number_container){
-            if (container.Id == message.id) {
-              _state.containers.splice(number_container, 1);
-            }
-          });
+          if(_state.containers) {
+            debug("container stopped on [" + key + "] machine: %j " + new Date(), message);
+            _.each(_state.containers, function (container, number_container) {
+              if (container.Id == message.id) {
+                _state.containers.splice(number_container, 1);
+              }
+            });
+          } else {
+            debug("stop event: container object is empty: %j " + new Date(), message);
+          }
         });
 
         value.on("destroy", function (message) {
-          debug("container destroyed on [" + key + "] machine: %j " + new Date(), message);
-          _.each(_state.containers, function(container, number_container){
-            if (container.Id == message.id) {
-              _state.containers.splice(number_container, 1);
-            }
-          });
+          if(_state.containers){
+            debug("container destroyed on [" + key + "] machine: %j " + new Date(), message);
+            _.each(_state.containers, function(container, number_container){
+              if (container.Id == message.id) {
+                _state.containers.splice(number_container, 1);
+              }
+            });
+          } else {
+            debug("destroy event: container object is emty: %j " + new Date(), message);
+          }
         });
         value.stop();
       });
