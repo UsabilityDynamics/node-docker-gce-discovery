@@ -3,56 +3,65 @@ var _ = require('lodash');
 var getDockerContainers = require('./lib/getDockerContainers');
 var Dockerode = require('dockerode');
 var DockerEvents = require('docker-events');
-var debug = require('debug');
+var debug = require('debug')('gce-discovery-create');
 
 module.exports.create = function containersList( options ) {
-  
+
   var _state = {
     containers: [],
     machines: []
   };
-  
+
   options = _.defaults(options, {
     gceConfig: {}, //path to service account JSON file or the object itself || string
     zones: [],
     project: null,
     externalIP: false,
     machineTags: [], // required tags a GCE machine must have to be monitored || array
+    docker: true,
     dockerPort: 2375, // which port on the found machines to use to connect || number
     watch: true // if enabled watch Docker Daemon for changes || bool
   });
 
   async.auto({
+
     get_machines_data: [function (callback) {
       debug('inside get_machines_data');
       getDockerContainers.getDockerContainers(options, function getContainers(error, machines_data) {
         debug('inside index - getDockerContainers');
-          callback(error, machines_data);
+        callback(error, machines_data);
       });
 
     }],
+
     instances_list: ['get_machines_data', function (results, callback) {
 
       _state.machines = results.get_machines_data.machines;
       var instances = {};
 
+      if( !options.docker ) {
+        callback( null, instances);
+        return;
+      }
+
       debug('inside instances_list');
 
       async.each(results.get_machines_data.machines, function (value_each, callback_each) {
 
-          instances[value_each.name] = new DockerEvents({
-            docker: new Dockerode({
-              host: value_each.host,
-              port: parseInt(value_each.port)
-            }),
-          });
-          callback_each();
+        instances[value_each.name] = new DockerEvents({
+          docker: new Dockerode({
+            host: value_each.host,
+            port: parseInt(value_each.port)
+          }),
+        });
+        callback_each();
 
       }, function (error) {
         callback(error, instances);
       });
 
-    }],
+    }]
+
   }, function (error, result) {
 
     if(error){
@@ -65,11 +74,12 @@ module.exports.create = function containersList( options ) {
       _state.containers.push(item2);
     });
 
-    if(options.watch){
-      _.each(result.instances_list, function (value, key) {
+    if( options.watch ){
+
+      _.each( result.instances_list, function (value, key) {
 
         value.start();
-        
+
         value.on("connect", function () {
           debug("connected to docker api machine [" + key + "] " + new Date());
         });
@@ -124,10 +134,12 @@ module.exports.create = function containersList( options ) {
           }
         });
         value.stop();
+
       });
+
     }
   });
-  
+
   return _state;
 }
 
