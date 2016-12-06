@@ -112,7 +112,7 @@ module.exports.create = function containersList( options ) {
           if(_state.containers) {
             debug("container stopped on [" + key + "] machine: %j " + new Date(), message);
             _.each(_state.containers, function (container, number_container) {
-              if (container.Id == message.id) {
+              if ( typeof container == "object" && container.Id == message.id) {
                 _state.containers.splice(number_container, 1);
               }
             });
@@ -125,7 +125,7 @@ module.exports.create = function containersList( options ) {
           if(_state.containers){
             debug("container destroyed on [" + key + "] machine: %j " + new Date(), message);
             _.each(_state.containers, function(container, number_container){
-              if (container.Id == message.id) {
+              if ( typeof container == "object" && container.Id == message.id) {
                 _state.containers.splice(number_container, 1);
               }
             });
