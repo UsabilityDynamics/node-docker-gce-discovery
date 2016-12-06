@@ -51,7 +51,7 @@ module.exports.create = function containersList( options ) {
         instances[value_each.name] = new DockerEvents({
           docker: new Dockerode({
             host: value_each.host,
-            port: parseInt(value_each.port)
+            port: parseInt(value_each.dockerPort)
           }),
         });
         callback_each();
