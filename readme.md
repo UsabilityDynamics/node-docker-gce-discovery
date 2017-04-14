@@ -27,3 +27,10 @@ discoveryInstance.machines //has machines list.
 ```
 
 You should to set zones and project name. Look basic-usage.js
+
+
+### Events
+
+* ready:machines - Machine list available
+* ready:containers - Have container list.
+* ready - Have both machines and containers (or error).

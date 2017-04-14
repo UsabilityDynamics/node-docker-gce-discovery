@@ -12,6 +12,8 @@ module.exports.create = function containersList( options ) {
     machines: []
   };
 
+  require( 'object-emitter' ).mixin( _state );    
+
   options = _.defaults(options, {
     gceConfig: {}, //path to service account JSON file or the object itself || string
     zones: [],
@@ -23,18 +25,27 @@ module.exports.create = function containersList( options ) {
     watch: true // if enabled watch Docker Daemon for changes || bool
   });
 
+  options.machineTags = _.flatten( [options.machineTags] );
+  options.zones = _.flatten( [options.zones] );
+
+
   async.auto({
 
     get_machines_data: [function (callback) {
       debug('inside get_machines_data');
-      getDockerContainers.getDockerContainers(options, function getContainers(error, machines_data) {
+      getDockerContainers.getDockerContainers(options, function getContainers(error, machines_data, detail) {
         debug('inside index - getDockerContainers');
+
+        _state.emit( 'ready:machines', null, _.get( machines_data, 'machines'  ) );
+        
         callback(error, machines_data);
       });
 
     }],
 
     instances_list: ['get_machines_data', function (results, callback) {
+
+      _state.emit( 'ready:containers', null, results );
 
       _state.machines = results.get_machines_data.machines;
       var instances = {};
@@ -54,9 +65,13 @@ module.exports.create = function containersList( options ) {
             port: parseInt(value_each.dockerPort)
           }),
         });
+        
         callback_each();
 
       }, function (error) {
+        
+        _state.emit( 'ready:containers', null, instances) ;
+        
         callback(error, instances);
       });
 
@@ -64,6 +79,8 @@ module.exports.create = function containersList( options ) {
 
   }, function (error, result) {
 
+    _state.emit( 'ready', error, result ) ;
+        
     if(error){
       debug(error);
       _state.error = error;
