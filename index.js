@@ -1,9 +1,9 @@
 var async = require('async');
 var _ = require('lodash');
 var getDockerContainers = require('./lib/getDockerContainers');
+var getCCmachines = require('./lib/getDockerCCMachines');
 var Dockerode = require('dockerode');
 var DockerEvents = require('docker-events');
-var debug = require('debug')('gce-discovery-create');
 
 module.exports.create = function containersList( options ) {
 
@@ -12,152 +12,168 @@ module.exports.create = function containersList( options ) {
     machines: []
   };
 
-  require( 'object-emitter' ).mixin( _state );    
-
   options = _.defaults(options, {
     gceConfig: {}, //path to service account JSON file or the object itself || string
-    zones: [],
-    project: null,
-    externalIP: false,
     machineTags: [], // required tags a GCE machine must have to be monitored || array
-    docker: true,
     dockerPort: 2375, // which port on the found machines to use to connect || number
     watch: true // if enabled watch Docker Daemon for changes || bool
   });
 
-  options.machineTags = _.flatten( [options.machineTags] );
-  options.zones = _.flatten( [options.zones] );
+  //console.log('create options', require('util').inspect(options, {showHidden: false, depth: 10, colors: true}));
 
 
   async.auto({
-
     get_machines_data: [function (callback) {
-      debug('inside get_machines_data');
-      getDockerContainers.getDockerContainers(options, function getContainers(error, machines_data, detail) {
-        debug('inside index - getDockerContainers');
-
-        _state.emit( 'ready:machines', null, _.get( machines_data, 'machines'  ) );
-        
-        callback(error, machines_data);
+      console.log(require('util').inspect('inside get_machines_data', {showHidden: false, depth: 10, colors: true}));
+      getDockerContainers.getDockerContainers(options, function getContainers(options, machines_data) {
+        console.log(require('util').inspect('inside getDockerContainers', {showHidden: false, depth: 10, colors: true}));
+        //console.log('machines_data machines_data machines_data', require('util').inspect(machines_data, {showHidden: false, depth: 10, colors: true}));
+        callback(null, machines_data);
       });
 
     }],
-
     instances_list: ['get_machines_data', function (results, callback) {
 
-      _state.emit( 'ready:containers', null, results );
-
+      //console.log('results.container_list', require('util').inspect(results.container_list, {showHidden: false, depth: 10, colors: true}));
       _state.machines = results.get_machines_data.machines;
       var instances = {};
 
-      if( !options.docker ) {
-        callback( null, instances);
-        return;
-      }
-
-      debug('inside instances_list');
+      console.log(require('util').inspect('inside instances_list', {showHidden: false, depth: 10, colors: true}));
 
       async.each(results.get_machines_data.machines, function (value_each, callback_each) {
 
         instances[value_each.name] = new DockerEvents({
           docker: new Dockerode({
             host: value_each.host,
-            port: parseInt(value_each.dockerPort)
+            port: parseInt(value_each.port)
           }),
         });
-        
         callback_each();
 
       }, function (error) {
-        
-        _state.emit( 'ready:containers', null, instances) ;
-        
-        callback(error, instances);
+        callback(null, instances);
       });
 
-    }]
-
+    }],
   }, function (error, result) {
 
-    _state.emit( 'ready', error, result ) ;
-        
-    if(error){
-      debug(error);
-      _state.error = error;
-      return;
-    }
+    //var containers_list = result.get_machines_data.containers;
 
     _.each(result.get_machines_data.containers, function(item2){
-      _state.containers.push(item2);
+      _state.containers.push(item2)
     });
 
-    if( options.watch ){
+    //console.log('containers_list', require('util').inspect(containers_list, {showHidden: false, depth: 10, colors: true}));
 
-      _.each( result.instances_list, function (value, key) {
+    //console.log(require('util').inspect('final container_list', {showHidden: false, depth: 10, colors: true}));
+
+    if(options.watch){
+      _.each(result.instances_list, function (value, key) {
 
         value.start();
 
         value.on("connect", function () {
-          debug("connected to docker api machine [" + key + "] " + new Date());
+          console.log("connected to docker api machine [" + key + "] " + new Date());
         });
 
         value.on("disconnect", function () {
-          debug("disconnected to docker api machine [" + key + "] " + new Date());
+          console.log("disconnected to docker api machine [" + key + "] " + new Date());
         });
 
         value.on("create", function (message) {
-          debug("container created on [" + key + "] machine: %j " + new Date(), message);
+          console.log("container created on [" + key + "] machine: %j " + new Date(), message);
           getDockerContainers.getDockerContainers(options, function getContainers(options, machines_data) {
             _state.containers = [];
             _.each(machines_data.containers, function(item){
-              _state.containers.push(item);
+              _state.containers.push(item)
             });
           });
         });
 
         value.on("start", function (message) {
-          debug("container started on [" + key + "] machine: %j " + new Date(), message);
+          console.log("container started on [" + key + "] machine: %j " + new Date(), message);
           getDockerContainers.getDockerContainers(options, function getContainers(options, machines_data) {
             _state.containers = [];
             _.each(machines_data.containers, function(item){
-              _state.containers.push(item);
+              _state.containers.push(item)
             });
+            //console.log('start _state.containers', require('util').inspect(_state.containers, {showHidden: false, depth: 1, colors: true}));
           });
         });
 
         value.on("stop", function (message) {
-          if(_state.containers) {
-            debug("container stopped on [" + key + "] machine: %j " + new Date(), message);
-            _.each(_state.containers, function (container, number_container) {
-              if ( typeof container == "object" && container.Id == message.id) {
+          console.log("container stopped on [" + key + "] machine: %j " + new Date(), message);
+
+          //console.log('stop _state.containers', require('util').inspect(_state.containers, {showHidden: false, depth: 1, colors: true}));
+          _.each(_state.containers, function(container, number_container){
+            // console.log('container.Id', require('util').inspect(container.Id, {showHidden: false, depth: 10, colors: true}));
+            // console.log('message.id', require('util').inspect(message.id, {showHidden: false, depth: 10, colors: true}));
+            if(typeof container != 'undefined'){
+              if (container.Id == message.id) {
+                //console.log('container.Id', require('util').inspect(container.Id, {showHidden: false, depth: 1, colors: true}));
                 _state.containers.splice(number_container, 1);
+                //console.log('stop _state.containers', require('util').inspect(_state.containers, {showHidden: false, depth: 1, colors: true}));
               }
-            });
-          } else {
-            debug("stop event: container object is empty: %j " + new Date(), message);
-          }
+            }
+          });
+
         });
 
         value.on("destroy", function (message) {
-          if(_state.containers){
-            debug("container destroyed on [" + key + "] machine: %j " + new Date(), message);
-            _.each(_state.containers, function(container, number_container){
-              if ( typeof container == "object" && container.Id == message.id) {
-                _state.containers.splice(number_container, 1);
-              }
-            });
-          } else {
-            debug("destroy event: container object is empty: %j " + new Date(), message);
-          }
+          console.log("container destroyed on [" + key + "] machine: %j " + new Date(), message);
+
+          _.each(_state.containers, function(container, number_container){
+            if (container.Id == message.id) {
+              _state.containers.splice(number_container, 1);
+              console.log('destroy _state.containers', require('util').inspect(_state.containers, {showHidden: false, depth: 1, colors: true}));
+            }
+          });
+
         });
+
         value.stop();
 
       });
-
     }
+
+    //console.log(require('util').inspect(events, {showHidden: false, depth: 10, colors: true}));
   });
 
   return _state;
 }
+
+// module.exports.getCCmachines = function ( options ) {
+//
+//   // var _state = {
+//   //   machines: []
+//   // };
+//   var _state1 = [];
+//
+//   options = _.defaults(options, {
+//     gceConfig: {}, //path to service account JSON file or the object itself || string
+//     machineTags: [], // required tags a GCE machine must have to be monitored || array
+//     dockerPort: 2375, // which port on the found machines to use to connect || number
+//     watch: true // if enabled watch Docker Daemon for changes || bool
+//   });
+//
+//   var o = false;
+//
+// //console.log('create options', require('util').inspect(options, {showHidden: false, depth: 10, colors: true}));
+//
+//   getCCmachines.getDockerCCMachines(options, function getDockerCCMachines(options, machines_data) {
+//     console.log(require('util').inspect('inside getDockerCCMachines', {showHidden: false, depth: 10, colors: true}));
+//     //console.log('machines_data machines_data machines_data', require('util').inspect(machines_data, {showHidden: false, depth: 10, colors: true}));
+//     _.each(_.get(_.get(machines_data, 'get_obj_machine')), function(value){
+//       _state1.push(value);
+//     });
+//     o = true;
+//   });
+//
+//   if(o){
+//     console.log(require('util').inspect('passed timeout', {showHidden: false, depth: 10, colors: true}));
+//     return _state1;
+//   }
+//
+// }
 
 
